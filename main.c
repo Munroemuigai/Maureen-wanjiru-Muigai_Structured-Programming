@@ -1,47 +1,136 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-int main()
-{
-    int userPin, PIN=1234;
-    printf("Enter Pin");
-    scanf("%d",&userPin);
-    if(userPin==PIN) {
-         printf("ACCESS GRANTED\n");
-         int choice;
-          printf("Enter your choice (1,2,3,4)");
+// ---------- Function Prototypes ----------
+bool login();
+void showMenu();
+void balanceInquiry(float balance);
+float deposit(float balance);
+float withdraw(float balance);
 
-    printf("1.open door\n");
-    printf("2.change user_name\n");
-    printf("3.change pin\n");
-    printf("4.exit\n");
-    scanf("%d",&choice);
+// ---------- Main Function ----------
+int main() {
+    float balance = 1000.0;   // Initial account balance
 
-    switch(choice){
+    printf("====== Welcome to the ATM System ======\n\n");
+
+    // Login
+    if (!login()) {
+        printf("\nAccess Denied. Exiting...\n");
+        return 0;
+    }
+
+    int choice;
+    while (1) {
+        showMenu();
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
             case 1:
-                printf("open door");
+                balanceInquiry(balance);
                 break;
+
             case 2:
-                printf("change user_name");
+                balance = deposit(balance);
                 break;
+
             case 3:
-                printf("change pin");
+                balance = withdraw(balance);
                 break;
+
             case 4:
-                printf("exit");
-                break;
+                printf("Thank you for using the ATM. Goodbye!\n");
+                return 0;
+
             default:
-                printf("invalid choice.access denied");
+                printf("Invalid option. Try again.\n");
+        }
+
+        printf("\n----------------------------------------\n");
     }
 
-}else{
-        printf("ACCESS DENIED!");
+    return 0;
+}
+
+// ---------- Function Definitions ----------
+
+// 1. Login / PIN Verification Function
+bool login() {
+    const int storedPIN = 1234;
+    int enteredPIN;
+    int attempts = 0;
+
+    while (attempts < 3) {
+        printf("Enter PIN: ");
+        scanf("%d", &enteredPIN);
+
+        if (enteredPIN == storedPIN) {
+            printf("Login successful!\n\n");
+            return true;
+        } else {
+            printf("Incorrect PIN. Try again.\n");
+        }
+
+        attempts++;
     }
-    if(PIN<444){
-        printf("PIN is too short");
-    if(PIN>4444){
-        printf("PIN is too long");
+
+    return false;
+}
+
+// 2. Show ATM Menu
+void showMenu() {
+    printf("\n========== ATM MENU ==========\n");
+    printf("1. Balance Inquiry\n");
+    printf("2. Deposit\n");
+    printf("3. Withdraw\n");
+    printf("4. Exit\n");
+    printf("================================\n");
+}
+
+// 3. Balance Inquiry
+void balanceInquiry(float balance) {
+    printf("Your current balance is: %.2f\n", balance);
+}
+
+// 4. Deposit Function
+float deposit(float balance) {
+    float amount;
+
+    printf("Enter amount to deposit: ");
+    scanf("%f", &amount);
+
+    if (amount <= 0) {
+        printf("Invalid amount.\n");
+        return balance;
     }
- }
-return 0;
+
+    balance += amount;
+    printf("Deposit successful. New balance: %.2f\n", balance);
+
+    return balance;
+}
+
+// 5. Withdraw Function
+float withdraw(float balance) {
+    float amount;
+
+    printf("Enter amount to withdraw: ");
+    scanf("%f", &amount);
+
+    if (amount <= 0) {
+        printf("Invalid amount.\n");
+        return balance;
+    }
+
+    if (amount > balance) {
+        printf("Insufficient balance. Withdrawal failed.\n");
+        return balance;
+    }
+
+    balance -= amount;
+    printf("Withdrawal successful. New balance: %.2f\n", balance);
+
+    return balance;
 }
